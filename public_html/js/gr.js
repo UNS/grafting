@@ -36,11 +36,14 @@ var root = this;
 		ctx.beginPath();
 		ctx.translate(p.x, p.y);
 		ctx.rotate(dir + Math.PI);
+		ctx.fillStyle = "green";
+		ctx.fillRect(0, -y3, 5, 5);
+		ctx.fillRect(0, y3, 5, 5);
 		if (p.phase === 2) {
 			ctx.moveTo(0, -y3);
 			ctx.lineTo(0, y3);
 		} else if (p.phase === 3) {
-			ctx.moveTo(dis - r2, 0);
+			ctx.moveTo(r2 - dis, 0);
 		}
 		if (p.phase === 1) {
 			ctx.arc(0 - dis, 0, r,
@@ -58,7 +61,7 @@ var root = this;
 			ctx.moveTo(0, -y3);
 			ctx.lineTo(0, y3);
 		} else if (p.phase === 3) {
-			ctx.moveTo(dis - r2, 0);
+			ctx.moveTo(r2 - dis, 0);
 		}
 		if (p.phase === 1) {
 			ctx.arc(0 - dis, 0, r,
@@ -72,7 +75,10 @@ var root = this;
 				false);
 		}
 		ctx.closePath();
-		ctx.fillStyle = "gray";
+		if (p.phase === 3)
+			ctx.fillStyle = "red";
+		else
+			ctx.fillStyle = "gray";
 		ctx.fill();
 		ctx.restore();
 	};
@@ -121,12 +127,12 @@ var root = this;
 					break;
 
 				case 2:
-					a[i].u += 1;
+					a[i].u -= 0.1;
 					draw(a[i], a[i].t - a[i].t % 1, a[i].alpha, a[i].u, a[i].r);
 					break;
 
 				case 3:
-					a[i].u += 3;
+					a[i].u -= 0.3;
 					draw(a[i], a[i].t - a[i].t % 1, a[i].alpha, a[i].u, a[i].r);
 					break;
 			}
