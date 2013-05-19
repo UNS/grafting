@@ -35,23 +35,23 @@ var root = this;
 		ctx.save();
 		ctx.beginPath();
 		ctx.translate(p.x, p.y);
+		ctx.rotate(dir + Math.PI);
 		if (p.phase === 2) {
 			ctx.moveTo(0, -y3);
 			ctx.lineTo(0, y3);
 		} else if (p.phase === 3) {
 			ctx.moveTo(dis - r2, 0);
 		}
-		ctx.rotate(dir + Math.PI);
 		if (p.phase === 1) {
 			ctx.arc(0 - dis, 0, r,
-			Math.PI/2,
-			3 * Math.PI / 2,
-			false);
+				Math.PI / 2,
+				3 * Math.PI / 2,
+				false);
 		} else {
-		ctx.arc(0 - dis, 0, r,
-			u * Math.PI / 180,
-			(360 - u) * Math.PI / 180,
-			false);
+			ctx.arc(0 - dis, 0, r,
+				u * Math.PI / 180,
+				(360 - u) * Math.PI / 180,
+				false);
 		}
 		ctx.rotate(Math.PI);
 		if (p.phase === 2) {
@@ -62,14 +62,14 @@ var root = this;
 		}
 		if (p.phase === 1) {
 			ctx.arc(0 - dis, 0, r,
-			Math.PI/2,
-			3 * Math.PI / 2,
-			false);
+				Math.PI / 2,
+				3 * Math.PI / 2,
+				false);
 		} else {
-		ctx.arc(0 - dis, 0, r,
-			u * Math.PI / 180,
-			(360 - u) * Math.PI / 180,
-			false);
+			ctx.arc(0 - dis, 0, r,
+				u * Math.PI / 180,
+				(360 - u) * Math.PI / 180,
+				false);
 		}
 		ctx.closePath();
 		ctx.fillStyle = "gray";
@@ -130,7 +130,6 @@ var root = this;
 					draw(a[i], a[i].t - a[i].t % 1, a[i].alpha, a[i].u, a[i].r);
 					break;
 			}
-			draw(a[i], a[i].t - a[i].t % 1, a[i].alpha, a[i].u);
 			ctx.restore();
 		}
 	};
