@@ -15,13 +15,13 @@ var root = this;
 		} else {
 			switch (type) {
 				case 0:
-					this.dir = Math.PI/2;
+					this.dir = Math.PI / 2;
 					break;
 				case 1:
-					this.dir = 5 * Math.PI / 4;
+					this.dir = Math.PI/2 + 2 * Math.PI / 3;
 					break;
 				case 2:
-					this.dir = 7 * Math.PI/4;
+					this.dir =  Math.PI/2 + 4 * Math.PI / 3;
 					break;
 			}
 		}
@@ -51,7 +51,6 @@ var root = this;
 
 	Rebro.prototype.draw = function() {
 		ctx.save();
-			
 		if (this.dis === 0) {
 			var _r = 30;
 			var _u = 70;
@@ -112,11 +111,47 @@ var root = this;
 		this.st1 = new Rebro(this, 1, this, 2);
 		this.st_ = new Rebro(this, 2, this, 0);
 
-		this.dis = 0;	
+		this.dis = 0;
 		this.dir = 0;
 	};
 
+	point.prototype.sep = function() {
+		console.log("separate");
+		var p1 = new point(this.x + Math.cos(this.dir), this.y + Math.sin(this.dir));		
+		var p2 = new point(this.x + Math.cos(this.dir), this.y + Math.sin(this.dir));
+		var ix = null;
+		for(var i in a) {
+			if (a[i] === this)
+				ix = i;
+		}
+		if (ix !== null)
+			a.splice(ix, 1);
+		a.push(p1, p2);
+	};
+
 	point.prototype.draw = function() {
+		if (this.phase === 0) {
+			ctx.save();
+			ctx.beginPath();
+			ctx.translate(this.x, this.y);
+			ctx.arc(0, 0, this.r, 0, 2 * Math.PI, false);
+			ctx.fillStyle = "gray";
+			ctx.closePath();
+			ctx.fill();
+			ctx.restore();
+			return;
+		}
+
+		if (this.phase >= 2) {
+			this.u -= 0.3;
+			if (this.phase === 3) {
+				this.u -= 0.2;
+			}
+
+			if (this.u <= 0) {
+				this.sep();
+			}
+		}
 		if (this.phase > 1) {
 			var x1 = this.r * Math.cos(this.u * Math.PI / 180);
 			var y1 = this.r * Math.sin((360 - this.u) * Math.PI / 180);
@@ -135,9 +170,6 @@ var root = this;
 		ctx.beginPath();
 		ctx.translate(this.x, this.y);
 		ctx.rotate(this.alpha + Math.PI);
-		ctx.fillStyle = "green";
-		ctx.fillRect(0, -y3, 5, 5);
-		ctx.fillRect(0, y3, 5, 5);
 		if (this.phase === 2) {
 			ctx.moveTo(0, -y3);
 			ctx.lineTo(0, y3);
@@ -220,7 +252,8 @@ var root = this;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		drawRebra();
 		for (var i = 0; i < a.length; i++) {
-			a[i].dis += 0.5;
+			if (a[i].phase > 0)
+				a[i].dis += 0.5;
 			if ((a[i].dis > 10) && (a[i].phase === 1))
 				a[i].phase = 2;
 			ctx.save();
