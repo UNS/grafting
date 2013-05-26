@@ -18,10 +18,10 @@ var root = this;
 					this.dir = Math.PI / 2;
 					break;
 				case 1:
-					this.dir = Math.PI/2 + 2 * Math.PI / 3;
+					this.dir = Math.PI / 2 + 2 * Math.PI / 3;
 					break;
 				case 2:
-					this.dir =  Math.PI/2 + 4 * Math.PI / 3;
+					this.dir = Math.PI / 2 + 4 * Math.PI / 3;
 					break;
 			}
 		}
@@ -102,7 +102,7 @@ var root = this;
 	var point = function(x, y) {
 		this.x = x;
 		this.y = y;
-		this.r = 50;
+		this.r = 40;
 		this.t = 0;
 		this.u = 90;
 		this.alpha = Math.PI * Math.random();
@@ -117,16 +117,37 @@ var root = this;
 
 	point.prototype.sep = function() {
 		console.log("separate");
-		var p1 = new point(this.x + Math.cos(this.dir), this.y + Math.sin(this.dir));		
-		var p2 = new point(this.x + Math.cos(this.dir), this.y + Math.sin(this.dir));
+		var p1 = new point(this.x + this.dis * Math.cos(this.alpha), this.y + this.dis * Math.sin(this.alpha));
+		var p2 = new point(this.x + this.dis * Math.cos(this.alpha + Math.PI), this.y + this.dis * Math.sin(this.alpha + Math.PI));
+		p1.alpha = this.alpha;
+		p2.alpha = this.alpha;
+		p1.phase = 0;
+		p2.phase = 0;
+		if (Math.cos(this.st_.dir) <= 0)
+			p1.st_.dir = this.st_.dir;
+		else
+			p2.st_.dir = this.st_.dir;
+
+		if (Math.cos(this.st0.dir) <= 0)
+			p1.st0.dir = this.st0.dir;
+		else
+			p2.st0.dir = this.st0.dir;
+
+		if (Math.cos(this.st_.dir) <= 0)
+			p1.st1.dir = this.st1.dir;
+		else
+			p2.st1.dir = this.st1.dir;
+
 		var ix = null;
-		for(var i in a) {
+		for (var i in a) {
 			if (a[i] === this)
 				ix = i;
 		}
-		if (ix !== null)
+		if (ix !== null) {
+			a.push(p1);
+			a.push(p2);
 			a.splice(ix, 1);
-		a.push(p1, p2);
+		}
 	};
 
 	point.prototype.draw = function() {
