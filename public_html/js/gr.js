@@ -11,8 +11,8 @@ var root = this;
 		this.dis = 0;
 		this.type = type;
 		if (nextState !== parent) {
-			this.nextState = nextState;
-			this.nextValue = nextValue;
+			this.setNextState(nextState);
+			this.setNextValue(nextValue);
 		} else {
 			switch (type) {
 				case 0:
@@ -31,7 +31,7 @@ var root = this;
 	Rebro.prototype.setNextState = function(state) {
 		var dx = parent.x - state.x;
 		var dy = parent.y - state.y;
-		this.dir = Math.tan2(dy, dx);
+		this.dir = Math.atan2(dy, dx);
 		this.dis = Math.sqrt(Math.pow(parent.x - state.x, 2) + Math.pow(parent.y - state.y));
 		this.nextState = state;
 	};
@@ -87,6 +87,7 @@ var root = this;
 			ctx.rotate(this.dir);
 			ctx.moveTo(this.parent.r, 0);
 			ctx.lineTo(this.dis - this.nextState.r, 0);
+			ctx.strokeStyle = "gray";
 			ctx.stroke();
 		}
 		ctx.restore();
@@ -238,7 +239,6 @@ var root = this;
 	var a = [new point(150, 150, 50), new point(450, 300, 50)];
 	a[0].phase = 0;
 	a[0].st0 = new Rebro(a[0], 0, a[1], 1);
-
 	var selected = root.selected = [];
 
 	canvas.addEventListener("touchstart", function(e) {
@@ -254,9 +254,11 @@ var root = this;
 				}
 			}
 			
-			if (min !== -1) {
+			if (jmin !== -1) {
+				console.log("jmin " + jmin);
+
 				if (min > a[jmin].r) {
-					var tu = Math.tan2(a[jmin].y - ts[i].pageY,a[jmin].x - ts[i].pageX);
+					var tu = Math.atan2(a[jmin].y - ts[i].pageY, a[jmin].x - ts[i].pageX);
 					var r_ = a[jmin].st_.dir - tu;
 					var r0 = a[jmin].st0.dir - tu;
 					var r1 = a[jmin].st1.dir - tu;
@@ -313,10 +315,7 @@ var root = this;
 		}
 	});
 
-	var render = function() {
-		ctx.fillStyle = 'white';
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		drawRebra();
+	var drawPoints = function() {
 		for (var i = 0; i < a.length; i++) {
 			if (a[i].phase > 0)
 				a[i].dis += 0.5;
@@ -331,6 +330,30 @@ var root = this;
 			a[i].draw(color);
 			ctx.restore();
 		}
+	};
+
+	var drawLenta = function() {
+		var h = canvas.height;
+		var w = canvas.width;
+		ctx.fillStyle = "black";
+		ctx.fillRect(w/2 - 5, h - 110, 25, 90);
+		for (var i = 0; i < 30; i++) {
+			if (i % 4 > 0) {
+				ctx.fillStyle = "green";
+			} else {
+				ctx.fillStyle = "gray";
+			}
+			ctx.fillRect(w/2 - i * 20, h - 100, 15, 70);
+			ctx.fillRect(w/2 + i * 20, h - 100, 15, 70);
+		}
+	};
+
+	var render = function() {
+		ctx.fillStyle = 'white';
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		drawRebra();
+		drawPoints();
+		drawLenta();
 	};
 
 	window.requestAnimFrame = (function() {
