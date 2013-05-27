@@ -6,6 +6,7 @@ var root = this;
 	var ctx = canvas.getContext('2d');
 
 	var Rebro = function(parent, type, nextState, nextValue) {
+		this.s = false;
 		this.parent = parent;
 		this.dis = 0;
 		this.type = type;
@@ -77,7 +78,10 @@ var root = this;
 				false);
 			ctx.closePath();
 			ctx.lineWidth = 10;
-			ctx.strokeStyle = "gray";
+			if (this.s)
+				ctx.strokeStyle = "red";
+			else
+				ctx.strokeStyle = "gray";
 			ctx.stroke();
 		} else {
 			ctx.rotate(this.dir);
@@ -116,7 +120,6 @@ var root = this;
 	};
 
 	point.prototype.sep = function() {
-		console.log("separate");
 		var p1 = new point(this.x + this.dis * Math.cos(this.alpha), this.y + this.dis * Math.sin(this.alpha));
 		var p2 = new point(this.x + this.dis * Math.cos(this.alpha + Math.PI), this.y + this.dis * Math.sin(this.alpha + Math.PI));
 		p1.alpha = this.alpha;
@@ -150,13 +153,13 @@ var root = this;
 		}
 	};
 
-	point.prototype.draw = function() {
+	point.prototype.draw = function(color) {
 		if (this.phase === 0) {
 			ctx.save();
 			ctx.beginPath();
 			ctx.translate(this.x, this.y);
 			ctx.arc(0, 0, this.r, 0, 2 * Math.PI, false);
-			ctx.fillStyle = "gray";
+			ctx.fillStyle = color;
 			ctx.closePath();
 			ctx.fill();
 			ctx.restore();
@@ -227,20 +230,22 @@ var root = this;
 				false);
 		}
 		ctx.closePath();
-		ctx.fillStyle = "gray";
+		ctx.fillStyle = color;
 		ctx.fill();
 		ctx.restore();
 	};
 
-	var a = [new point(500, 200, 50), new point(400, 400, 50), new point(700, 250, 50)];
+	var a = [new point(150, 150, 50), new point(450, 300, 50)];
 	a[0].phase = 0;
+	a[0].st0 = new Rebro(a[0], 0, a[1], 1);
+
 	var selected = root.selected = [];
 
 	canvas.addEventListener("touchstart", function(e) {
 		var ts = e.changedTouches;
 		for (var i = 0; i < ts.length; i++) {
-			var min = 50;
-			var jmin = 0;
+			var min = 150;
+			var jmin = -1;
 			for (var j = 0; j < a.length; j++) {
 				var d = Math.sqrt(Math.pow(ts[i].pageX - a[j].x, 2) + Math.pow(ts[i].pageY - a[j].y, 2));
 				if (d < min) {
@@ -248,8 +253,21 @@ var root = this;
 					jmin = j;
 				}
 			}
-
-			if (min > 0) {
+			
+			if (min !== -1) {
+				if (min > a[jmin].r) {
+					var tu = Math.tan2(a[jmin].y - ts[i].pageY,a[jmin].x - ts[i].pageX);
+					var r_ = a[jmin].st_.dir - tu;
+					var r0 = a[jmin].st0.dir - tu;
+					var r1 = a[jmin].st1.dir - tu;
+					var rm = Math.min(r_, r0, r1);	
+					if (rm === r_)
+						a[jmin].st_.s = true;
+					if (rm === r0)
+						a[jmin].st0.s = true;
+					if (rm === r1)
+						a[jmin].st1.s = true;
+				}
 				a[jmin].s = true;
 				a[jmin].dx = 0;
 				a[jmin].dy = 0;
@@ -263,7 +281,34 @@ var root = this;
 					}
 					selected.push({tsID: ts[i].identifier, bodyID: jmin});
 				}
-				//console.log(JSON.stringify(selected));
+			}
+		}
+	});
+
+	canvas.addEventListener("touchmove", function(e) {
+		var ts = e.changedTouches;
+		for (var i = 0; i < ts.length; i++) {
+			for (var j = 0; j < selected.length; j++) {
+				if (selected[j].tsID === ts[i].identifier) {
+					var obj = a[selected[j].bodyID];
+					obj.x = ts[i].pageX;
+					obj.y = ts[i].pageY;
+				}
+			}
+		}
+	});
+
+	canvas.addEventListener("touchend", function(e) {
+		var ts = e.changedTouches;
+		for (var i = 0; i < ts.length; i++) {
+			for (var j = 0; j < selected.length; j++) {
+				if (selected[j].tsID === ts[i].identifier) {
+					a[selected[j].bodyID].s = false;
+					a[selected[j].bodyID].st_.s = false;
+					a[selected[j].bodyID].st0.s = false;
+					a[selected[j].bodyID].st1.s = false;
+					selected.splice(j, 1);
+				}
 			}
 		}
 	});
@@ -278,7 +323,12 @@ var root = this;
 			if ((a[i].dis > 10) && (a[i].phase === 1))
 				a[i].phase = 2;
 			ctx.save();
-			a[i].draw();
+			var color = "gray";
+			for (var j in selected) {
+				if (selected[j].bodyID === i)	
+					color = "red";
+			}
+			a[i].draw(color);
 			ctx.restore();
 		}
 	};
